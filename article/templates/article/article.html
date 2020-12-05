@@ -1,0 +1,182 @@
+{% extends "article/base.html" %}
+{% block content %}
+  <h1>{{ article.title }}</h1>
+ <!-- <h6>{{ article.publication_date }}</h6> -->
+  <br/>
+  <p style="white-space: pre-wrap;">{{ article.text }}</p>
+  <h6 id="number_of_likes">Likes:  {{ count }}</h6>
+  <!-- User can like/comment on an article if they are logged in-->
+  {% if user.is_authenticated %}
+{% if like %}
+    <button style="background-color: rgb(42,125,246); color:white" id="like_button" class="btn btn-outline-primary">
+        {% else %}
+        <button  id="like_button" class="btn btn-outline-primary">
+            {% endif %}
+      <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-hand-thumbs-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+
+
+          <path fill-rule="evenodd" d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16v-1c.563 0 .901-.272 1.066-.56a.865.865 0 0 0 .121-.416c0-.12-.035-.165-.04-.17l-.354-.354.353-.354c.202-.201.407-.511.505-.804.104-.312.043-.441-.005-.488l-.353-.354.353-.354c.043-.042.105-.14.154-.315.048-.167.075-.37.075-.581 0-.211-.027-.414-.075-.581-.05-.174-.111-.273-.154-.315L12.793 9l.353-.354c.353-.352.373-.713.267-1.02-.122-.35-.396-.593-.571-.652-.653-.217-1.447-.224-2.11-.164a8.907 8.907 0 0 0-1.094.171l-.014.003-.003.001a.5.5 0 0 1-.595-.643 8.34 8.34 0 0 0 .145-4.726c-.03-.111-.128-.215-.288-.255l-.262-.065c-.306-.077-.642.156-.667.518-.075 1.082-.239 2.15-.482 2.85-.174.502-.603 1.268-1.238 1.977-.637.712-1.519 1.41-2.614 1.708-.394.108-.62.396-.62.65v4.002c0 .26.22.515.553.55 1.293.137 1.936.53 2.491.868l.04.025c.27.164.495.296.776.393.277.095.63.163 1.14.163h3.5v1H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z"/>
+
+      </svg> Like
+    </button>
+    <hr>
+    <form method="POST" id="comment-form">
+      <div class="form-group">
+        <textarea class="form-control" id="commentTextArea" rows="3"></textarea>
+      </div>
+      <button id="add_comment_button" type="submit" class="btn btn-primary">Add comment</button>
+    </form>
+    <hr>
+  {% else %}
+    <p style="color:#961e15;">Please log in to like and comment</p>
+  {% endif %}
+
+  <div id="comment-container" style="margin-left: 7%;">
+    {% if comments %}
+      {% for comment in comments %}
+        <div id="individual-comment{{comment.id}}">
+          <!-- When author of the comment is logged in, they can delete/update it -->
+          {% if user.profile == comment.user %}
+            <button id="show_update{{comment.id}}" class="btn btn-outline-primary btn-sm show_update_form">
+              <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pen" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
+              </svg> Update
+            </button>
+            <button id="{{comment.id}}" class="btn btn-outline-danger btn-sm delete_buttons">
+              <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-trash" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+              </svg> Delete
+            </button>
+          {% endif %}
+          <div class="comment">
+              <p id="comment-author{{comment.id}}" style="white-space: pre-wrap;color:rgb(42,125,246)">{{ comment.user }}</p>
+              <p id="comment-text{{comment.id}}" style="white-space: pre-wrap;">{{ comment.content }}</p>
+          </div>
+
+          <form method="POST" id="update-form{{comment.id}}" style="display: none;">
+            <div class="form-group">
+              <textarea class="form-control" id="updateTextArea{{comment.id}}" rows="3">{{ comment.content }}</textarea>
+            </div>
+            
+            <button id="update_comment_button{{comment.id}}" type="submit" class="btn btn-primary update_buttons">Update comment</button>
+          </form>
+          <hr>
+        </div>
+      {% endfor %}
+      
+    {% else %}
+        <p id="no-comments-p">There are no comments yet</p>
+    {% endif %}
+  </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <script>
+      var currentArticle = "{{ article.id }}";
+      $("#like_button").click(function(e) {
+        e.preventDefault();
+        $.ajax({
+          type: 'LIKE',
+          url: (currentArticle + '/like'),
+          data:{
+            article_id: currentArticle,
+          },
+          success: function(json) {
+
+              window.location.replace(currentArticle);
+          },
+          error : function(xhr) {
+            console.log("There is an error ", xhr.status);
+          }
+        })
+      })
+
+      $(".delete_buttons").click(function(e) {
+          e.preventDefault();
+          var clickedBtnID = $(this).attr('id');
+          $.ajax({
+            type: 'POST',
+            url: (currentArticle + '/delete/'),
+            data:{
+              action: 'delete',
+              delete_id: clickedBtnID,
+            },
+            success: function(json) {
+              console.log("Comment was deleted");
+              $("#individual-comment" + clickedBtnID).remove();
+            },
+            error : function(xhr) {
+              console.log("There is an error ", xhr.status);
+            }
+          })
+        })
+
+
+      $(document).on('submit', '#comment-form',function(e){
+        e.preventDefault();
+        $.ajax({
+            type:'POST',
+            url: (currentArticle + '/comment/'),
+            dataType: 'json',
+            data:{
+                comment_text:$('#commentTextArea').val(),
+                article_id: currentArticle,
+            },
+            success:function(){
+                var comment_text = $('#commentTextArea').val();
+                document.getElementById("comment-form").reset();
+                $("#comment-container").prepend(
+                    '<div class="comment"><p> <b>{{ user.username }}</b> |  <span class="text-muted">{% now "DATETIME_FORMAT" %}</span></p><p id="comment-text{{comment.id}}" style="white-space: pre-wrap;">' + comment_text + '</p><hr></div>')
+                if ( $( "p#no-comments-p" ).length ) {
+                  $("p#no-comments-p").remove();
+                }
+            },
+            error : function(xhr,errmsg,err) {
+            console.log(xhr.status, xhr.responseText, errmsg);
+              }
+          });
+      });
+
+      $(".show_update_form").click(function(){
+        var clickedForm = $(this).attr('id');
+        var update_element = $("#update-form" + clickedForm.substring(11));
+        if(update_element.css('display') == 'none') {
+          update_element.show();
+        }
+        else if(update_element.css('display') == 'block') {
+          update_element.hide();
+        }
+      });
+
+      $(document).ready(function(){
+      $(".update_buttons").click(function(e) {
+          e.preventDefault();
+          var clickedID = $(this).attr('id');
+          clickedID = clickedID.substring(21);
+          console.log(clickedID);
+          $.ajax({
+            type: 'POST',
+            url: (currentArticle + '/update/'),
+            data:{
+              action: 'delete',
+              update_id: clickedID,
+              update_text: $("#updateTextArea" + clickedID).val(),
+            },
+            success: function(json) {
+              console.log("Comment was updated");
+              $("p#comment-text" + clickedID).text($("#updateTextArea" + clickedID).val());
+              $("#update-form" + clickedID).hide();
+            },
+            error : function(xhr) {
+              console.log("There is an error ", xhr.status);
+            }
+          })
+        })
+      })
+    </script>
+
+{% endblock content %}

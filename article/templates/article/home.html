@@ -1,0 +1,19 @@
+{% extends "article/base.html" %}
+{% block content %}
+    {% if articles_list %}
+        {% for article in articles_list %}
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <p class="mr-2">{{ article.category.category_name }}</p>
+                </div>
+                <h2><a class="article-title" href="{% url 'article' article.id %}">{{ article.title }}</a></h2>
+                <p class="article-content">{{ article.text }}...</p>
+
+            </div>
+        </article>
+        {% endfor %}
+    {% else %}
+        <p>No articles are available.</p>
+    {% endif %}
+{% endblock content %}
